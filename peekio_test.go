@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alexatcanva/peekio"
+	"github.com/alexbathome/peekio"
 )
 
 func TestPeekReader_Read(t *testing.T) {
