@@ -93,8 +93,8 @@ func TestPeekReader_SequentialReads(t *testing.T) {
 	}{
 		{"Hello", nil},
 		{", Wor", nil},
-		{"ld!", nil},  // only 3 bytes remain, but read buf is 5
-		{"", io.EOF},  // content exhausted
+		{"ld!", nil}, // only 3 bytes remain, but read buf is 5
+		{"", io.EOF}, // content exhausted
 	}
 
 	for i, r := range reads {

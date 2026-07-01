@@ -6,21 +6,40 @@ package peekio
 
 // Peeker is an interface that allows peeking into a stream of data without consuming it.
 type Peeker interface {
-	// Peek returns the next n bytes from the stream without advancing the read position.
-	// If fewer than n bytes are available, it returns all available bytes.
-	// If the end of the stream is reached, it returns an error.
-	//
-	// The returned slice is only valid until the next call to Peek or Read.
-	// The caller should not modify the contents of the returned slice.
 	Peek(n int) ([]byte, error)
 }
 
+// PeekReader is an io.Reader that adapts a Peeker to be passed into a caller
+// that expects an io.Reader.
+//
+// It behaves the same as an io.Reader, where the underlying buffer appears to
+// be consumed, however in actuality, PeekReader is just advancing an offset.
 type PeekReader struct {
 	offset int
 	peeker Peeker
 }
 
 // NewPeekReader creates a new PeekReader that wraps the provided Peeker.
+//
+// Example:
+//
+//	r := bufio.NewReader(strings.NewReader("Hello, World!"))
+//	pr := peekio.NewPeekReader(r)
+//
+//	buf := make([]byte, 5)
+//	_, _ = pr.Read(buf)
+//	println("buf:", string(buf)) // "buf: Hello"
+//
+//	_, _ = pr.Read(buf)
+//	println("buf:", string(buf)) // "buf: , Wor"
+//
+//	// the underlying reader has not been consumed
+//	_, _ = r.Read(buf)
+//	println("buf:", string(buf)) // "buf: Hello"
+//	// Output:
+//	//	buf: Hello
+//	//	buf: , Wor
+//	//	buf: Hello
 func NewPeekReader(peeker Peeker) *PeekReader {
 	return &PeekReader{
 		offset: 0,
